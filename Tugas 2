@@ -1,1 +1,96 @@
+import random
+
+class Robot:
+    def __init__(self, name):
+        self.name = name
+        self.level = 1
+        self.hp = 100
+        self.attack = 10
+        self.energy = 100
+        self.status = None  # Bisa 'stun' atau 'burn'
+    
+    def normal_attack(self, opponent):
+        if self.status == 'stun':
+            print(f"{self.name} ter-stun dan tidak bisa menyerang!")
+            self.status = None  # Reset status
+            return
+        damage = random.randint(self.attack - 2, self.attack + 2)
+        opponent.hp -= damage
+        print(f"{self.name} menyerang {opponent.name} dan memberikan {damage} damage!")
+    
+    def special_skill(self, opponent):
+        if self.energy >= 50:
+            self.energy -= 50
+            effect = random.choice(['stun', 'burn', 'damage'])
+            if effect == 'stun':
+                opponent.status = 'stun'
+                print(f"{self.name} menggunakan skill spesial! {opponent.name} terkena stun!")
+            elif effect == 'burn':
+                opponent.status = 'burn'
+                print(f"{self.name} menggunakan skill spesial! {opponent.name} terbakar!")
+            else:
+                extra_damage = random.randint(15, 25)
+                opponent.hp -= extra_damage
+                print(f"{self.name} menggunakan skill spesial dan memberikan {extra_damage} damage tambahan!")
+        else:
+            print(f"{self.name} tidak memiliki cukup energi untuk skill spesial!")
+    
+    def recover_energy(self):
+        recovered = random.randint(10, 20)
+        self.energy += recovered
+        print(f"{self.name} memulihkan {recovered} energi!")
+    
+    def level_up(self):
+        self.level += 1
+        self.hp = 100 + (self.level * 10)
+        self.attack += 2
+        print(f"{self.name} naik level! Sekarang level {self.level} dengan {self.hp} HP dan {self.attack} attack power.")
+    
+    def check_status(self):
+        if self.status == 'burn':
+            burn_damage = 5
+            self.hp -= burn_damage
+            print(f"{self.name} terkena efek burn! Kehilangan {burn_damage} HP.")
+            self.status = None  # Reset status setelah efek berjalan
+
+class Game:
+    def __init__(self, robot1, robot2):
+        self.robot1 = robot1
+        self.robot2 = robot2
+    
+    def start_battle(self):
+        print("Pertarungan dimulai!")
+        while self.robot1.hp > 0 and self.robot2.hp > 0:
+            self.robot1.check_status()
+            self.robot2.check_status()
+            
+            if self.robot1.hp > 0:
+                self.robot_turn(self.robot1, self.robot2)
+            
+            if self.robot2.hp > 0:
+                self.robot_turn(self.robot2, self.robot1)
+            
+            print(f"{self.robot1.name}: {self.robot1.hp} HP, {self.robot1.energy} Energy")
+            print(f"{self.robot2.name}: {self.robot2.hp} HP, {self.robot2.energy} Energy")
+            print("-")
+            
+        winner = self.robot1 if self.robot1.hp > 0 else self.robot2
+        print(f"{winner.name} memenangkan pertarungan!")
+        winner.level_up()
+    
+    def robot_turn(self, robot, opponent):
+        action = random.choice(['attack', 'skill', 'recover'])
+        if action == 'attack':
+            robot.normal_attack(opponent)
+        elif action == 'skill':
+            robot.special_skill(opponent)
+        else:
+            robot.recover_energy()
+
+# Inisialisasi robot dan permainan
+robot_a = Robot("Mecha-1")
+robot_b = Robot("Cyber-X")
+
+battle = Game(robot_a, robot_b)
+battle.start_battle()
 
